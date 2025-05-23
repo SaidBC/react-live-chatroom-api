@@ -8,6 +8,9 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  // For Replit compatibility
+  relationMode = "prisma"
 }
 
 model User {
@@ -37,6 +40,9 @@ model Message {
   roomId    String
   user      User     @relation(fields: [userId], references: [id])
   room      Room     @relation(fields: [roomId], references: [id])
+  
+  @@index([userId])
+  @@index([roomId])
 }
 
 enum Role {
@@ -61,4 +67,6 @@ model ApiToken {
   expiresAt   DateTime?
   lastUsedAt  DateTime?
   revoked     Boolean   @default(false)
+  
+  @@index([userId])
 }
