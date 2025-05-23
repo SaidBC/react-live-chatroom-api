@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { User } from "@prisma/client";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -47,9 +47,9 @@ export const generateToken = (user: User): string => {
     role: user.role,
   };
 
-  return jwt.sign(payload, JWT_SECRET as jwt.Secret, {
-    expiresIn: JWT_EXPIRES_IN as jwt.StringValue,
-  });
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN
+  } as SignOptions);
 };
 
 export const verifyToken = (token: string): JwtPayload => {
@@ -93,9 +93,9 @@ export const generateAPIToken = (
   
   if (payload === null) throw new Error("Invalid payload for token generation");
   
-  return jwt.sign(payload, JWT_API_SECRET as jwt.Secret, {
-    expiresIn: JWT_EXPIRES_IN as jwt.StringValue,
-  });
+  return jwt.sign(payload, JWT_API_SECRET, {
+    expiresIn: JWT_EXPIRES_IN
+  } as SignOptions);
 };
 
 export const verifyAPIToken = (token: string): JwtAPIPayload => {
