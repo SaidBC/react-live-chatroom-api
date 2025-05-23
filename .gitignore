@@ -47,6 +47,7 @@ coverage/
 
 # dotenv environment variable files
 .env
+.env.prod
 
 # parcel-bundler cache
 .cache
