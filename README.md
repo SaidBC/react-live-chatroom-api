@@ -103,8 +103,6 @@ The server implements WebSocket for real-time messaging with the following event
 
 ## Setup and Installation
 
-### Local Development
-
 1. Install dependencies:
    ```bash
    npm install
@@ -129,35 +127,6 @@ The server implements WebSocket for real-time messaging with the following event
    ```bash
    npm run dev
    ```
-
-### Replit Setup
-
-1. Fork this repository to your Replit account.
-
-2. Set up environment variables in Replit:
-   - Go to the Secrets tab (lock icon) in your Replit project
-   - Add the following environment variables:
-     ```
-     DATABASE_URL=prisma://accelerate.prisma-data.net/?api_key=YOUR_API_KEY
-     DIRECT_URL=postgresql://username:password@hostname:port/database
-     JWT_SECRET=your-secret-key
-     JWT_API_SECRET=your-api-secret-key
-     JWT_EXPIRES_IN=7d
-     PORT=3001
-     ```
-
-3. Set up Prisma Data Proxy (Accelerate):
-   - Create an account at https://cloud.prisma.io/
-   - Create a new project and connect your database
-   - Get your API key and use it in the DATABASE_URL above
-
-4. Run the following commands in the Replit Shell:
-   ```bash
-   npm install
-   npx prisma generate
-   ```
-
-5. Click the Run button to start the server
 
 ## Available Scripts
 
