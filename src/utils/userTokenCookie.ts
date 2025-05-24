@@ -38,7 +38,9 @@ export const setUserTokenCookie = (res: Response, user: UserPayload): void => {
  * @returns User payload or null
  */
 export const getUserTokenFromCookie = (req: Request): UserPayload | null => {
-  const token = req.cookies[COOKIE_NAME];
+  // Safely access cookies - handle case where req.cookies might be undefined
+  const cookies = req.cookies || {};
+  const token = cookies[COOKIE_NAME];
   
   if (!token) {
     return null;

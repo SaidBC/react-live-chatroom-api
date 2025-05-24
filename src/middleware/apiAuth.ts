@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAPIToken, JwtAPIPayload, JwtAPIPayloadType } from "../utils/jwt";
 import getToken from "../utils/getToken";
-import { getUserTokenFromCookie } from '../utils/userTokenCookie';
+import { getUserTokenFromCookie } from "../utils/userTokenCookie";
 
 export interface ApiAuthRequest extends Request {
   apiUser?: JwtAPIPayload;
@@ -30,7 +30,7 @@ export const authenticateApiToken = (
       req.apiUser = decoded;
       return next();
     }
-    
+
     // If no token in header, check for user token in cookies
     const userFromCookie = getUserTokenFromCookie(req);
     if (userFromCookie) {
@@ -43,17 +43,16 @@ export const authenticateApiToken = (
           read: true,
           write: true,
           delete: false,
-          rooms: []
-        }
+          rooms: [],
+        },
       };
       return next();
     }
-    
+
     // No token found in header or cookies
-    return res
-      .status(401)
-      .json({ error: "Unauthorized: No token provided" });
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
   } catch (error) {
+    console.error(error);
     return res.status(401).json({ error: "Unauthorized: Invalid token" });
   }
 };
@@ -67,9 +66,7 @@ export const authorizeClient = (
   next: NextFunction
 ) => {
   if (!req.apiUser || req.apiUser.type !== JwtAPIPayloadType.CLIENT) {
-    return res
-      .status(403)
-      .json({ error: "Forbidden: Client access required" });
+    return res.status(403).json({ error: "Forbidden: Client access required" });
   }
   next();
 };
@@ -100,15 +97,15 @@ export const authorizeRoomAccess = (prisma: any) => {
           id: roomId,
           users: {
             some: {
-              id: apiUser.userId
-            }
-          }
-        }
+              id: apiUser.userId,
+            },
+          },
+        },
       });
 
       if (!room) {
-        return res.status(403).json({ 
-          error: "Forbidden: You don't have access to this room" 
+        return res.status(403).json({
+          error: "Forbidden: You don't have access to this room",
         });
       }
 

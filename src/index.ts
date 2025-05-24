@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { PrismaClient } from '@prisma/client';
 import { setupRoutes } from './routes';
 import { 
@@ -28,6 +29,7 @@ const wss = new WebSocket.Server({ server });
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Setup API routes
 setupRoutes(app, prisma);
