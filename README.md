@@ -56,8 +56,6 @@ The application uses PostgreSQL with Prisma ORM. The main models are:
 
 ### Authentication
 
-- `POST /api/auth/register`: Register a new user
-- `POST /api/auth/login`: Login a user
 - `GET /api/auth/profile`: Get user profile
 - `PUT /api/auth/profile`: Update user profile
 
@@ -75,6 +73,10 @@ The application uses PostgreSQL with Prisma ORM. The main models are:
 - `GET /api/messages`: Get all messages (admin/client only)
 - `GET /api/users/:userId/messages`: Get messages for a user
 
+### Users
+
+- `POST /api/users`: Create a new user (requires client token)
+
 ### Tokens
 
 - `POST /api/tokens/user`: Generate a user token
@@ -83,15 +85,22 @@ The application uses PostgreSQL with Prisma ORM. The main models are:
 
 ## Authentication
 
-The API uses two types of authentication:
+The API uses a token-based authentication system with two types of tokens:
 
-1. **User Authentication**: For regular users
-2. **API Token Authentication**: For clients accessing the API
+1. **Client Tokens**: Required to create users and access admin features
+2. **User Tokens**: Generated when a user is created, used for regular user operations
+
+### Authentication Flow
+
+1. Client applications must first obtain a client token
+2. Using the client token, clients can create users
+3. When a user is created, a user token is generated and returned
+4. The user token is used for all subsequent user operations
 
 ### Token Types
 
-- **USER**: Tokens for authenticated users
-- **CLIENT**: Tokens for API clients
+- **USER**: Tokens for authenticated users, generated during user creation
+- **CLIENT**: Tokens for API clients, required to create users
 
 ## WebSocket Implementation
 

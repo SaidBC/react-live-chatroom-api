@@ -23,7 +23,36 @@ export const authenticateApiToken = (
   next: NextFunction
 ) => {
   try {
-    // First check for token in Authorization header
+    // Development bypass - only use in development/testing
+    if (process.env.NODE_ENV !== 'production' && process.env.BYPASS_AUTH === 'true') {
+      req.apiUser = {
+        userId: 'dev-user',
+        username: 'developer',
+        role: 'admin',
+        type: JwtAPIPayloadType.USER,
+        permissions: {
+          read: true,
+          write: true,
+          delete: true,
+          rooms: [],
+        },
+      };
+      return next();
+    }
+    
+    // Check query parameter token (useful for cross-origin scenarios)
+    const queryToken = req.query.token as string;
+    if (queryToken) {
+      try {
+        const decoded = verifyAPIToken(queryToken);
+        req.apiUser = decoded;
+        return next();
+      } catch (e) {
+        console.log('Invalid query token, continuing to other auth methods');
+      }
+    }
+    
+    // Check for token in Authorization header
     const token = getToken(req);
     if (token) {
       const decoded = verifyAPIToken(token);
@@ -31,7 +60,7 @@ export const authenticateApiToken = (
       return next();
     }
 
-    // If no token in header, check for user token in cookies
+    // Check for user token in cookies
     const userFromCookie = getUserTokenFromCookie(req);
     if (userFromCookie) {
       req.apiUser = {
@@ -48,8 +77,26 @@ export const authenticateApiToken = (
       };
       return next();
     }
+    
+    // For Cloudflare environment - temporary public access
+    if (req.headers.host?.includes('cloudflare') && req.method === 'GET') {
+      console.log('Allowing public access for GET requests in Cloudflare environment');
+      req.apiUser = {
+        userId: 'public-user',
+        username: 'public',
+        role: 'user',
+        type: JwtAPIPayloadType.USER,
+        permissions: {
+          read: true,
+          write: false,
+          delete: false,
+          rooms: [],
+        },
+      };
+      return next();
+    }
 
-    // No token found in header or cookies
+    // No token found in any location
     return res.status(401).json({ error: "Unauthorized: No token provided" });
   } catch (error) {
     console.error(error);
@@ -70,6 +117,15 @@ export const authorizeClient = (
   }
   next();
 };
+
+/**
+ * Middleware to authenticate and authorize client tokens in one step
+ * This combines authenticateApiToken and authorizeClient
+ */
+export const authenticateClientToken = [
+  authenticateApiToken,
+  authorizeClient
+];
 
 /**
  * Middleware to check if the user has access to a specific room
